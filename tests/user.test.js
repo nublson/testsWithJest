@@ -1,35 +1,13 @@
-/**
- * @jest-environment node
- */
-
 require('dotenv').config({
 	path: '.env.testing'
 })
 
 const request = require('supertest')
-const jwt = require('jsonwebtoken')
-const mongoose = require('mongoose')
 const app = require('../src/app')
 const User = require('../src/models/user')
+const { defaultUserId, defaultUser, setupDatabase } = require('./fixtures/db')
 
-const defaultUserId = new mongoose.Types.ObjectId()
-const defaultUser = {
-	_id: defaultUserId,
-	name: 'Nubelson Fernandes',
-	email: 'nubelsondev@example.com',
-	password: '12345678',
-	tokens: [
-		{
-			token: jwt.sign({ _id: defaultUserId }, process.env.JWT_SECRET)
-		}
-	]
-}
-
-beforeEach(async () => {
-	await User.deleteMany()
-
-	await new User(defaultUser).save()
-})
+beforeEach(setupDatabase)
 
 test('Should sign up a new user', async () => {
 	const newUser = {
